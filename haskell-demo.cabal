@@ -1,0 +1,24 @@
+cabal-version:      3.6
+name:               haskell-demo
+version:            0.1.0.0
+author:             Yvan Sraka
+maintainer:         yvan@sraka.xyz
+
+executable haskell-demo
+    main-is:          Main.hs
+    build-depends:    base
+    hs-source-dirs:   app
+    default-language: Haskell2010
+    -- `haskell.nix` tell GHC linker where to find the `libgreetings.a` by
+    -- setting automatically `extra-lib-dirs`:
+    -- https://input-output-hk.github.io/haskell.nix/tutorials/pkg-map.html
+    extra-libraries:  greetings
+
+  -- Cross-compilation to target `x86_64-w64-mingw32-cc` thrown a lot of
+  -- `undefined reference to 'X'` errors during linking stage ...
+  if os(windows)
+    extra-libraries: userenv ws2_32 bcrypt
+    -- Here is a mapping between library names and missing symbols:
+    -- `bcrypt`  -> `BCryptGenRandom`
+    -- `userenv` -> `GetUserProfileDirectoryW`
+    -- `ws2_32`  -> `freeaddrinfo getaddrinfo WSASend WSARecv WSASocketW`
